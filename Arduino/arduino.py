@@ -395,14 +395,18 @@ class Arduino(object):
         else:
             return -1
 
-    def tone(self, pin, freq):
+    def tone(self, pin, freq, duration=None):
         """
         Plays a tone at the specified frequency in Hz.
         inputs:
             pin: digital pin number for playback
             freq: tone frequency in Hz
+            duration: duration of tone in ms (optional)
         """
-        cmd_str = build_cmd_str("ton", [pin, freq])
+        if not duration:
+            cmd_str = build_cmd_str("ton", [pin, freq])
+        else:
+            cmd_str = build_cmd_str("ton", [pin, freq, duration])
         self.sr.write(str.encode(cmd_str))
         self.sr.flush()
 

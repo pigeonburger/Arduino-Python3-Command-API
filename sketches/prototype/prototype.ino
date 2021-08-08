@@ -118,8 +118,17 @@ void Tone(String data){
 void NormalTone(String data){
     int idx = data.indexOf('%');
     int pin = Str2int(data.substring(0,idx));
-    int freq = Str2int(data.substring(idx+1));
-    tone(pin, freq);
+    String data2 = data.substring(idx+1);
+    if (data2.indexOf('%') == -1){
+        int freq = Str2int(data.substring(idx+1));
+        tone(pin, freq);
+    }
+    else {
+        int idx2 = data2.indexOf('%');
+        int freq = Str2int(data2.substring(0,idx2));
+        int duration = Str2int(data2.substring(idx2+1));
+        tone(pin, freq, duration);
+    }
 }
 
 void ToneNo(String data){
