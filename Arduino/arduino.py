@@ -395,6 +395,28 @@ class Arduino(object):
         else:
             return -1
 
+    def tone(self, pin, freq):
+        """
+        Plays a tone at the specified frequency in Hz.
+        inputs:
+            pin: digital pin number for playback
+            freq: tone frequency in Hz
+        """
+        cmd_str = build_cmd_str("ton", [pin, freq])
+        self.sr.write(str.encode(cmd_str))
+        self.sr.flush()
+
+
+    def noTone(self, pin):
+        """
+        Stop the currently playing tone on a specific pin.
+        inputs:
+            pin: digital pin number for stopping playback
+        """
+        cmd_str = build_cmd_str("nto", [pin])
+        self.sr.write(str.encode(cmd_str))
+        self.sr.flush()
+
     def capacitivePin(self, pin):
         '''
         Input:

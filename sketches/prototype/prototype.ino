@@ -115,6 +115,13 @@ void Tone(String data){
   }
 }
 
+void NormalTone(String data){
+    int idx = data.indexOf('%');
+    int pin = Str2int(data.substring(0,idx));
+    int freq = Str2int(data.substring(idx+1));
+    tone(pin, freq);
+}
+
 void ToneNo(String data){
   int pin = Str2int(data);
   noTone(pin);
@@ -379,6 +386,9 @@ void SerialParser(void) {
   }
   else if (cmd == "to") {
       Tone(data);
+  }
+  else if (cmd == "ton") {
+      NormalTone(data);
   }
   else if (cmd == "nto") {
       ToneNo(data);
