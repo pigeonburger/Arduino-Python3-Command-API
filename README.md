@@ -4,9 +4,11 @@ A Python API for communicating with your Arduino board.
 
 This is my own fork of the [original](https://github.com/mkals/Arduino-Python3-Command-API) version of this repo. I've added some new commands to suit my needs and use cases for Arduino, and will continue adding my modifications here as I need them.
 
-Below is the original repo:
+Below is the original README:
 
 ---------------
+
+# Arduino-Python3 Command API
 
 This API is forked from the original [Python Arduino Command API](https://github.com/thearn/Python-Arduino-Command-API) to add support for Python 3.
 
