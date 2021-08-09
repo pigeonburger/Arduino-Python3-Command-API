@@ -35,7 +35,6 @@ def enumerate_serial_ports():
         except EnvironmentError:
             break
 
-
 def build_cmd_str(cmd, args=None):
     """
     Build a command string that can be sent to the arduino.
@@ -154,6 +153,15 @@ class Arduino(object):
 
     def version(self):
         return get_version(self.sr)
+
+    # Equivalent to the map() function in C++
+    def map(self, value, leftMin, leftMax, rightMin, rightMax):
+        leftSpan = leftMax - leftMin
+        rightSpan = rightMax - rightMin
+
+        valueScaled = float(value - leftMin) / float(leftSpan)
+
+        return rightMin + (valueScaled * rightSpan)
 
     def digitalWrite(self, pin, val):
         """
