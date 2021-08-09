@@ -4,6 +4,8 @@ A Python API for communicating with your Arduino board.
 
 This is my own fork of the [original](https://github.com/mkals/Arduino-Python3-Command-API) version of this repo. I've added some new commands to suit my needs and use cases for Arduino, and will continue adding my modifications here as I need them.
 
+To install, clone or download this repository to your computer, and run `python setup.py build install` in the newly downloaded folder.
+
 Below is the original README:
 
 ---------------
@@ -49,10 +51,6 @@ while True:
 - [Python](http://python.org/) 3.7 tested on Windows and macOS.
 - [pyserial](http://pyserial.sourceforge.net/) 2.6 or higher
 - Any [Arduino compatible microcontroller](https://www.sparkfun.com/categories/242) with at least 14KB of flash memory
-
-## Installation:
-Either run `pip install arduino-python3` from a command line, or run `python setup.py
-build install` from the source directory to install this library.
 
 ## Setup:
 1. Verify that your Arduino board communicates at the baud rate specified in the
