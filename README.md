@@ -4,6 +4,12 @@ A Python API for communicating with your Arduino board.
 
 This is my own fork of the [original](https://github.com/mkals/Arduino-Python3-Command-API) version of this repo. I've added some new commands to suit my needs and use cases for Arduino, and will continue adding my modifications here as I need them.
 
+This library is intended to be as similar Arduino's programming language syntax as possible.
+
+What I've added so far that is different to the version I adapted this from:
+- Added support for `tone()` and `noTone()` operations.
+- Added (almost) complete support for the [`LiquidCrystal`](https://www.arduino.cc/en/Reference/LiquidCrystal) library for controlling LCD screens (missing `write()` and `createChar()` functions)
+
 To install, clone or download this repository to your computer, and run `python setup.py build install` in the newly downloaded folder.
 
 Below is the original README:
