@@ -2,9 +2,11 @@
 #include <Wire.h>
 #include <Servo.h>
 #include <EEPROM.h>
+#include <LiquidCrystal.h>
+LiquidCrystal* lcd = nullptr;
 
 void Version(){
-  Serial.println(F("V0.6"));
+  Serial.println(F("V0.8"));
 }
 
 
@@ -95,6 +97,7 @@ uint8_t readCapacitivePin(String data) {
   Serial.println(cycles);
 }
 
+// Melody() function
 void Tone(String data){
   int idx = data.indexOf('%');
   int len = Str2int(data.substring(0,idx));
@@ -115,6 +118,7 @@ void Tone(String data){
   }
 }
 
+// tone() function
 void NormalTone(String data){
     int idx = data.indexOf('%');
     int pin = Str2int(data.substring(0,idx));
@@ -131,10 +135,134 @@ void NormalTone(String data){
     }
 }
 
+// noTone() function
 void ToneNo(String data){
   int pin = Str2int(data);
   noTone(pin);
 }
+
+/////////////////////////////////
+////// BEGIN LCD FUNCTIONS //////
+/////////////////////////////////
+// See https://www.arduino.cc/en/Reference/LiquidCrystal for reference to the LiquidCrystal library
+// @TODO: Add support for LiquidCrystal createChar() operation.
+
+// Creates an object of type LiquidCrystal. (currently only support 4 data pins)
+void LCDSet(String data){
+    // This string parsing is dogshit but I don't know much C++ so this is the best I could do
+    int idx = data.indexOf('%');
+    int RS = Str2int(data.substring(0,idx));
+    String data2 = data.substring(idx+1);
+    int idx2 = data2.indexOf('%');
+    int EN = Str2int(data2.substring(0,idx2));
+    String data3 = data2.substring(idx2+1);
+    int idx3 = data3.indexOf('%');
+    int D4 = Str2int(data3.substring(0,idx3));
+    String data4 = data3.substring(idx3+1);
+    int idx4 = data4.indexOf('%');
+    int D5 = Str2int(data4.substring(0,idx4));
+    String data5 = data4.substring(idx4+1);
+    int idx5 = data5.indexOf('%');
+    int D6 = Str2int(data5.substring(0,idx5));
+    String data6 = data5.substring(idx5+1);
+    int D7 = Str2int(data6);
+    lcd = new LiquidCrystal(RS, EN, D4, D5, D6, D7);
+}
+
+// Initializes the interface to the LCD screen, and specifies the dimensions of the display.
+void LCDBegin(String data){
+    int idx = data.indexOf('%');
+    int cols = Str2int(data.substring(0,idx));
+    int rows = Str2int(data.substring(idx+1));
+    lcd->begin(cols, rows);
+}
+
+// Deletes LCD object from system memory
+void LCDCleanup(){
+    delete lcd; lcd = nullptr;
+}
+
+// Clears the LCD screen and positions the cursor in the upper-left corner. 
+void LCDClear(){
+    lcd->clear();
+}
+
+// Positions the cursor in the upper-left corner of the LCD.
+void LCDHome(){
+    lcd->home();
+}
+
+// Prints text to the LCD screen
+void LCDPrint(String data){
+    lcd->print(data);
+}
+
+// Sets the location at which subsequent text written to the LCD will be displayed. 
+void LCDCursorHandler(String data){
+    int idx = data.indexOf('%');
+    int col = Str2int(data.substring(0,idx));
+    int row = Str2int(data.substring(idx+1));
+    lcd->setCursor(col, row);
+}
+
+// Displays or hides the LCD cursor
+void LCDCursor(int mode){
+    if (mode == 1){ //Show
+        lcd->cursor();
+    } else{ //Hide
+        lcd->noCursor();
+    }
+}
+
+// Displays or hides the blinking LCD cursor.
+void LCDBlink(int mode){
+    if (mode == 1){ //Show
+        lcd->blink();
+    } else{ //Hide
+        lcd->noBlink();
+    }
+}
+
+// Turns the LCD display on or off
+void LCDDisplay(int mode){
+    if (mode == 1){ //Show
+        lcd->display();
+    } else{ //Hide
+        lcd->noDisplay();
+    }
+}
+
+// Scroll text on the LCD screen
+void LCDScroll(int mode){
+    /* Modes
+    0 = Left
+    1 = Right
+    2 = Autoscroll
+    3 = No Autoscroll */
+    if (mode == 0){
+        lcd->scrollDisplayLeft();
+    } else if (mode == 1){
+        lcd->scrollDisplayRight();
+    } else if (mode == 2){
+        lcd->autoscroll();
+    } else if (mode == 3){
+        lcd->noAutoscroll();
+    }
+}
+
+// Sets the direction for text to be written to the LCD
+void LCDWritedir(int mode){
+    if (mode == 1){ // Left-Right
+        lcd->leftToRight();
+    } else{ // Right-Left
+        lcd->rightToLeft();
+    }
+}
+
+///////////////////////////////
+////// END LCD FUNCTIONS //////
+///////////////////////////////
+
 
 void DigitalHandler(int mode, String data){
       int pin = Str2int(data);
@@ -401,6 +529,63 @@ void SerialParser(void) {
   }
   else if (cmd == "nto") {
       ToneNo(data);
+  }
+  else if (cmd == "lcdh"){
+      LCDSet(data);
+  }
+  else if (cmd == "lcdb"){
+      LCDBegin(data);
+  }
+  else if (cmd == "lcdcl"){
+      LCDCleanup();
+  }
+  else if (cmd == "lcdc"){
+      LCDClear();
+  }
+  else if (cmd == "lcdho"){
+      LCDHome();
+  }
+  else if (cmd == "lcdp"){
+      LCDPrint(data);
+  }
+  else if (cmd == "lcdch"){
+      LCDCursorHandler(data);
+  }
+  else if (cmd == "lcdcc"){
+      LCDCursor(1);
+  }
+  else if (cmd == "lcdco"){
+      LCDCursor(0);
+  }
+  else if (cmd == "lcdbc"){
+      LCDBlink(1);
+  }
+  else if (cmd == "lcdbo"){
+      LCDBlink(0);
+  }
+  else if (cmd == "lcddc"){
+      LCDDisplay(1);
+  }
+  else if (cmd == "lcddo"){
+      LCDDisplay(0);
+  }
+  else if (cmd == "lcdsl"){
+      LCDScroll(0);
+  }
+  else if (cmd == "lcdsr"){
+      LCDScroll(1);
+  }
+  else if (cmd == "lcdsa"){
+      LCDScroll(2);
+  }
+  else if (cmd == "lcdsb"){
+      LCDScroll(3);
+  }
+  else if (cmd == "lcdwl"){
+      LCDWritedir(1);
+  }
+  else if (cmd == "lcdwr"){
+      LCDWritedir(0);
   }
   else if (cmd == "cap") {
       readCapacitivePin(data);

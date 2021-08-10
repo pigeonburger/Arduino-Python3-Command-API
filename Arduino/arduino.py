@@ -12,7 +12,7 @@ if sys.platform.startswith('win'):
 else:
     import glob
 
-libraryVersion = 'V0.6'
+libraryVersion = 'V0.8'
 
 log = logging.getLogger(__name__)
 
@@ -150,6 +150,7 @@ class Arduino(object):
         self.SoftwareSerial = SoftwareSerial(self)
         self.Servos = Servos(self)
         self.EEPROM = EEPROM(self)
+        self.LCD = LCD(self)
 
     def version(self):
         return get_version(self.sr)
@@ -675,12 +676,12 @@ class EEPROM(object):
         except:
             pass
 
-    def read(self, adrress):
+    def read(self, address):
         """ Reads a byte from the EEPROM.
 
         :address: the location to write to, starting from 0 (int)
         """
-        cmd_str = build_cmd_str("eer", (adrress,))
+        cmd_str = build_cmd_str("eer", (address))
         try:
             self.sr.write(str.encode(cmd_str))
             self.sr.flush()
@@ -689,3 +690,199 @@ class EEPROM(object):
                 return int(response)
         except:
             return 0
+
+class LCD(object):
+
+    """
+    Class for Arduino LiquidCrystal library support.
+    See https://www.arduino.cc/en/Reference/LiquidCrystal for reference to the LiquidCrystal library.
+
+    @TODO Add support for LiquidCrystal write() and createChar() functions.
+    """
+
+    def __init__(self, board):
+        self.board = board
+        self.sr = board.sr
+
+    def LiquidCrystal(self, rs, en, d4, d5, d6, d7):
+        """Creates an object of type LiquidCrystal.
+        See https://www.arduino.cc/en/Reference/LiquidCrystalConstructor for reference to what each input should be."""
+        cmd_str = build_cmd_str("lcdho", [rs, en, d4, d5, d6, d7])
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def begin(self, cols, rows):
+        """Initializes the interface to the LCD screen, and specifies the dimensions of the display.
+
+        Inputs:
+        cols (int): number of columns that the display has
+        rows (int): number of rows that the display has """
+        cmd_str = build_cmd_str("lcdb", [cols, rows])
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def cleanup(self):
+        """Deletes LCD object from Arduino system memory"""
+        cmd_str = build_cmd_str("lcdcl")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def clear(self):
+        """Clears the LCD screen and positions the cursor in the upper-left corner."""
+        cmd_str = build_cmd_str("lcdc")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def home(self):
+        """Positions the cursor in the upper-left corner of the LCD."""
+        cmd_str = build_cmd_str("lcdho")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def print(self, text):
+        """Prints text to the LCD screen.
+        
+        Inputs:
+        text (str): Text to print to the LCD."""
+        cmd_str = build_cmd_str("lcdp", [text])
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def setCursor(self, col, row):
+        """Sets the location at which subsequent text written to the LCD will be displayed.
+        
+        Inputs:
+        col (int): the column at which to position the cursor (with 0 being the first column)
+        row (int): the row at which to position the cursor (with 0 being the first row) """
+        cmd_str = build_cmd_str("lcdch", [col, row])
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def cursor(self):
+        """Displays the LCD cursor."""
+        cmd_str = build_cmd_str("lcdcc")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+    
+    def noCursor(self):
+        """Hides the LCD cursor."""
+        cmd_str = build_cmd_str("lcdco")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def blink(self):
+        """Displays the blinking LCD cursor."""
+        cmd_str = build_cmd_str("lcdbc")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def noBlink(self):
+        """Hides the blinking LCD cursor."""
+        cmd_str = build_cmd_str("lcdbo")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def display(self):
+        """Turns the LCD display on."""
+        cmd_str = build_cmd_str("lcddc")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def noDisplay(self):
+        """Turns the LCD display off."""
+        cmd_str = build_cmd_str("lcddo")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def scrollDisplayLeft(self):
+        """Scrolls the contents of the display (text and cursor) one space to the left."""
+        cmd_str = build_cmd_str("lcdsl")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def scrollDisplayRight(self):
+        """Scrolls the contents of the display (text and cursor) one space to the right."""
+        cmd_str = build_cmd_str("lcdsr")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def autoscroll(self):
+        """Turns on automatic scrolling of the LCD."""
+        cmd_str = build_cmd_str("lcdsa")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def noAutoscroll(self):
+        """Turns off automatic scrolling of the LCD."""
+        cmd_str = build_cmd_str("lcdsb")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def leftToRight(self):
+        """Set the direction for text written to the LCD to left-to-right."""
+        cmd_str = build_cmd_str("lcdwl")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
+
+    def rightToLeft(self):
+        """Set the direction for text written to the LCD to right-to-left."""
+        cmd_str = build_cmd_str("lcdwr")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
