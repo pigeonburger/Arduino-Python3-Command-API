@@ -23,7 +23,7 @@ as possible to their Arduino programming language counterparts. This allows for 
 
 
 # Installation + Setup
-1. To install, clone or download this repository to your computer, and run `python setup.py build install` in the newly downloaded folder.
+1. To install, run `pip install pyArduinoAPI`.
 
 2. Load the `prototype.ino` sketch onto your Arduino board, using the Arduino IDE.
 
