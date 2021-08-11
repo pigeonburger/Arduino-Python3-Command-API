@@ -2,46 +2,48 @@
 
 A Python API for communicating with your Arduino board.
 
-This is my own fork of the [original](https://github.com/mkals/Arduino-Python3-Command-API) version of this repo. I've added some new commands to suit my needs and use cases for Arduino, and will continue adding my modifications here as I need them.
-
-What I've added so far that is different to the version I adapted this from:
-- Added support for `tone()` and `noTone()` operations.
-- Added (almost) complete support for the [`LiquidCrystal`](https://www.arduino.cc/en/Reference/LiquidCrystal) library for controlling LCD screens (missing `write()` and `createChar()` functions)
-
-To install, clone or download this repository to your computer, and run `python setup.py build install` in the newly downloaded folder.
-
-Below is the original README:
-
----------------
-
-# Arduino-Python3 Command API
-
-This API is forked from the original [Python Arduino Command API](https://github.com/thearn/Python-Arduino-Command-API) to add support for Python 3.
-
-The Arduino-Python3 Command API is a lightweight Python library for
+A lightweight Python library for
 communicating with [Arduino microcontroller boards](http://www.arduino.cc/) from a connected computer using
 standard serial IO, either over a physical wire
 or wirelessly. It is written using a custom protocol, similar to [Firmata](http://firmata.org/wiki/Main_Page).
 
-This allows a user to quickly prototype programs for Arduino using Python code, or to
+This is my own fork of the [original](https://github.com/mkals/Arduino-Python3-Command-API) version of this repo. I've added some new commands to suit my needs and use cases for Arduino, and will continue adding my modifications here as I need them.
+
+This library allows a user to quickly prototype programs for Arduino using Python code, or to
 simply read/control/troubleshoot/experiment
 with hardware connected to an Arduino board without ever having to recompile and reload sketches to the board itself.
 
 Method names within the Arduino-Python3 Command API are designed to be as close
-as possible to their Arduino programming language counterparts
+as possible to their Arduino programming language counterparts. This allows for Arduino code to quickly be transcribed into Python, or vice-versa.
 
-## Simple usage example (LED blink)
+## Requirements:
+- [Python](http://python.org/) 3.7 or above (tested on Windows, Linux and macOS).
+- [pyserial](http://pyserial.sourceforge.net/) 2.6 or higher (`pip install pyserial`)
+- Any [Arduino compatible microcontroller](https://www.sparkfun.com/categories/242) with at least 14KB of flash memory
+
+
+# Installation + Setup
+1. To install, clone or download this repository to your computer, and run `python setup.py build install` in the newly downloaded folder.
+
+2. Load the `prototype.ino` sketch onto your Arduino board, using the Arduino IDE.
+
+3. Set up some kind of serial I/O communication between the Arduino board and your computer (via physical USB cable,
+Bluetooth, xbee, etc. + associated drivers)
+
+4. Add `from Arduino import Arduino` into your python script to communicate with your Arduino.
+---
+
+**What I've added so far that is different to the version I adapted this from:**
+- Added support for `tone()` and `noTone()` operations.
+- Added (almost) complete support for the [`LiquidCrystal`](https://www.arduino.cc/en/Reference/LiquidCrystal) library for controlling LCD screens (missing `write()` and `createChar()` functions)
+
+# Examples
+## Simple usage example (LED blink):
 ```python
-#!/usr/bin/env python
-"""
- Blinks an LED on digital pin 13
- in 1 second intervals
-"""
-
 from Arduino import Arduino
 import time
 
-board = Arduino() # plugged in via USB, serial com at rate 115200
+board = Arduino()
 board.pinMode(13, "OUTPUT")
 
 while True:
@@ -51,37 +53,61 @@ while True:
     time.sleep(1)
 ```
 
-## Requirements:
-- [Python](http://python.org/) 3.7 tested on Windows and macOS.
-- [pyserial](http://pyserial.sourceforge.net/) 2.6 or higher
-- Any [Arduino compatible microcontroller](https://www.sparkfun.com/categories/242) with at least 14KB of flash memory
+## Python adaptation of [Spaceship Interface](https://create.arduino.cc/projecthub/SBR/spaceship-interface-4e616d):
+```python
+from Arduino import Arduino
+import time
 
-## Setup:
-1. Verify that your Arduino board communicates at the baud rate specified in the
-`setup()` function (line 407) in `prototype.ino`. Change it there if necessary.
-2. Load the `prototype.ino` sketch onto your Arduino board, using the Arduino IDE.
-3. Set up some kind of serial I/O communication between the Arduino board and your computer (via physical USB cable,
-Bluetooth, xbee, etc. + associated drivers)
-4. Add `from Arduino import Arduino` into your python script to communicate with your Arduino
+board = Arduino()
+
+switchState = 0
+
+board.pinMode(3, "OUTPUT")
+board.pinMode(4, "OUTPUT")
+board.pinMode(5, "OUTPUT")
+board.pinMode(2, "INPUT")
+
+while True:
+    switchState = board.digitalRead(2)
+
+    if switchState == 0:
+        board.digitalWrite(3, "HIGH")
+        board.digitalWrite(4, "LOW")
+        board.digitalWrite(5, "LOW")
+    else:
+        board.digitalWrite(3, "LOW")
+        board.digitalWrite(4, "LOW")
+        board.digitalWrite(5, "HIGH")
+
+        time.sleep(0.25)
+        board.digitalWrite(4, "HIGH")
+        board.digitalWrite(5, "LOW")
+        time.sleep(0.25)
+```
+
+## Simple Servo Motor Control on pin 9:
+```python
+from Arduino import Arduino
+import time
+
+board = Arduino()
+
+board.Servos.attach(9)
+
+while True:
+    for pos in range(180):
+        board.Servos.write(9, pos)
+        time.sleep(0.015)
+
+    for pos in range(180):
+        pos = 180 - pos
+
+        board.Servos.write(9, pos)
+        time.sleep(0.015)
+```
 
 For a collection of examples, see `examples.py`. This file contains methods which replicate
 the functionality of many Arduino demo sketches.
-
-## Testing:
-The `tests` directory contains some basic tests for the library. Extensive code coverage is a bit difficult to expect for every release, since a positive test involves actually
-connecting and issuing commands to a live Arduino, hosting any hardware
-required to test a particular function. But a core of basic communication tests
-should at least be maintained here and used before merging into the `master` branch.
-
-After installation, the interactive tests can be run from the source directory:
-```bash
-$ python tests/test_main.py
-```
-
-Automated tests can be run from the source directory with:
-```bash
-$ python tests/test_arduino.py
-```
 
 ## Classes
 - `Arduino(baud)` - Set up communication with currently connected and powered
@@ -204,15 +230,54 @@ print(board.EEPROM.read(location))
 print('EEPROM size {size}'.format(size=board.EEPROM.size()))
 ```
 
+**LCD Screen LiquidCrystal Support Library (only supports 1 display currently)**
+
+*See https://www.arduino.cc/en/Reference/LiquidCrystal for reference to the LiquidCrystal library.*
+
+- `Arduino.LCD.LiquidCrystal(rs, en, d4, d5, d6, d7)` Creates an object of type LiquidCrystal.
+- `Arduino.LCD.begin(cols, rows)` Initializes the interface to the LCD screen, and specifies the dimensions of the display.
+- `Arduino.LCD.cleanup()` Deletes LCD object from Arduino system memory
+- `Arduino.LCD.clear()` Clears the LCD screen and positions the cursor in the upper-left corner.
+- `Arduino.LCD.home()` Positions the cursor in the upper-left corner of the LCD.
+- `Arduino.LCD.print(text)` Prints text to the LCD screen.
+- `Arduino.LCD.setCursor(col, row)` Sets the location at which subsequent text written to the LCD will be displayed.
+- `Arduino.LCD.cursor()` Displays the LCD cursor.
+- `Arduino.LCD.noCursor()` Hides the LCD cursor.
+- `Arduino.LCD.blink()` Displays the blinking LCD cursor.
+- `Arduino.LCD.noBlink()` Hides the blinking LCD cursor.
+- `Arduino.LCD.display()` Turns the LCD display on.
+- `Arduino.LCD.noDisplay()` Turns the LCD display off.
+- `Arduino.LCD.scrollDisplayLeft()` Scrolls the contents of the display (text and cursor) one space to the left.
+- `Arduino.LCD.scrollDisplayRight()` Scrolls the contents of the display (text and cursor) one space to the right.
+- `Arduino.LCD.autoscroll()` Turns on automatic scrolling of the LCD.
+- `Arduino.LCD.noAutoscroll()` Turns off automatic scrolling of the LCD.
+- `Arduino.LCD.leftToRight()` Set the direction for text written to the LCD to left-to-right.
+- `Arduino.LCD.rightToLeft()` Set the direction for text written to the LCD to right-to-left.
+
+```python
+#LCD "Hello World" and time since start example
+#Ported from https://www.arduino.cc/en/Tutorial/LibraryExamples/HelloWorld
+import time
+start_time = time.time()
+
+board.LCD.LiquidCrystal(12, 11, 5, 4, 3, 2)
+board.LCD.begin(16, 2)
+board.LCD.print("hello, world!")
+
+while True:
+    board.LCD.setCursor(0, 1)
+
+    board.LCD.print(round(time.time() - start_time))
+```
+
 
 **Misc**
 
 - `Arduino.close()` closes serial connection to the Arduino.
 
 ## To-do list:
-- Expand software serial functionality (`print()` and `println()`)
 - Add simple reset functionality that zeros out all pin values
-- Add I2C / TWI function support (Arduino `Wire.h` commands)
 - Include a wizard which generates 'prototype.ino' with selected serial baud rate and Arduino function support
 (to help reduce memory requirements).
-- Multi-serial support for Arduino mega (`Serial1.read()`, etc)
+- Add `write()` and `createChar()` functions for the LCD library.
+- Anything else that I come across that I need will be added here.
