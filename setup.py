@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name="pyArduinoAPI",
-  version="0.8.1",
+  version="0.8.2",
   install_requires=['pyserial'],
   author="Pigeonburger",
   author_email="pigeonburger@pigeonburger.xyz",
