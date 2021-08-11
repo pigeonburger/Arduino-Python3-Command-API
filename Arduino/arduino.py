@@ -84,7 +84,7 @@ def find_port(baud, timeout):
                 ver = ''
 
             if ver == 'V' or version == "version":
-                print("You need to update the version of the Arduino-Python3",
+                print("You need to update the version of the pyArduinoAPI",
                       "library running on your Arduino.")
                 print("The Arduino sketch is", version)
                 print("The Python installation is", libraryVersion)
@@ -139,7 +139,7 @@ class Arduino(object):
                         ver = ''
 
                     if ver == 'V' or version == "version":
-                        print("You need to update the version of the Arduino-Python3",
+                        print("You need to update the version of the pyArduinoAPI",
                               "library running on your Arduino.")
                         print("The Arduino sketch is", version)
                         print("The Python installation is", libraryVersion)
