@@ -6,7 +6,7 @@
 LiquidCrystal* lcd = nullptr;
 
 void Version(){
-  Serial.println(F("V0.8"));
+  Serial.println(F("V0.8.1"));
 }
 
 

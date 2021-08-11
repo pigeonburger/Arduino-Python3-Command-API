@@ -12,7 +12,7 @@ if sys.platform.startswith('win'):
 else:
     import glob
 
-libraryVersion = 'V0.8'
+libraryVersion = 'V0.8.1'
 
 log = logging.getLogger(__name__)
 
