@@ -273,7 +273,8 @@ while True:
 
 **Misc**
 
-- `Arduino.close()` closes serial connection to the Arduino.
+- `Arduino.resetFunc()` Resets the Arduino.
+- `Arduino.close()` Closes serial connection to the Arduino.
 
 ## To-do list:
 - Add simple reset functionality that zeros out all pin values

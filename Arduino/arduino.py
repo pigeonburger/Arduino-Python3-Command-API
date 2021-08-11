@@ -155,14 +155,23 @@ class Arduino(object):
     def version(self):
         return get_version(self.sr)
 
-    # Equivalent to the map() function in C++
     def map(self, value, leftMin, leftMax, rightMin, rightMax):
+        """Equivalent to the map() function in the Arduino language."""
         leftSpan = leftMax - leftMin
         rightSpan = rightMax - rightMin
 
         valueScaled = float(value - leftMin) / float(leftSpan)
 
         return rightMin + (valueScaled * rightSpan)
+
+    def resetFunc(self):
+        """Resets the board."""
+        cmd_str = build_cmd_str("rb")
+        try:
+            self.sr.write(str.encode(cmd_str))
+            self.sr.flush()
+        except:
+            pass
 
     def digitalWrite(self, pin, val):
         """

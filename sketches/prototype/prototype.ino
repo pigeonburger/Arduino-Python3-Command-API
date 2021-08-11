@@ -461,6 +461,12 @@ void EEPROMHandler(int mode, String data) {
     }
 }
 
+
+void ResetBoard() {
+    void(* resetFunc) (void) = 0;
+    resetFunc();
+}
+
 void SerialParser(void) {
   char readChar[64];
   Serial.readBytesUntil(33,readChar,64);
@@ -520,6 +526,9 @@ void SerialParser(void) {
   }
   else if (cmd == "version") {
       Version();
+  }
+  else if (cmd == "rb") {
+      ResetBoard();
   }
   else if (cmd == "to") {
       Tone(data);
